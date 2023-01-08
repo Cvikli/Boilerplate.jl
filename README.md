@@ -71,7 +71,7 @@ catch e
   showerror(stderr, e, bt)
   println()
 end
-sleep(0.3)
+sleep(1.3)
 println()
 println("These things actually make everything extremly fast to debug!")
 ```
