@@ -1,18 +1,20 @@
 # Boilerplate
-Enhance the productivity to even more! 
+**Enhance the productivity** till the skys! 
 
 Most of these are crazy useful function, should be adopted by the Base too.
 
 # Install
+```
 ] add RelevanceStacktrace
 using RelevanceStacktrace
+```
 or
-
+```
 using Pkg; Pkg.add("RelevanceStacktrace")
 using RelevanceStacktrace
-
+```
 # Fast overview
-'''
+```julia
 using Boilerplate
 
 # UNIVERSAL sizes! Really life saving in any situation! 
@@ -72,8 +74,7 @@ end
 sleep(0.3)
 println()
 println("These things actually make everything extremly fast to debug!")
-
-'''
+```
 
 # Why?
 @show is extremly useful due to you don't have to do paranthesis. It sounds like a minor thing, but actually this is key. Julia most important fast debug function has to adopt this style as it is extremly fast to type. (Of course in other language you use macros for this, but also that gives crazy amount of boilerplate code, which is cognitive burden and should be reduced as much as possible.) That is why @sizes and @typeof is also extremly useful. (Ofc, it could be standardised by community, as this is mainly for support my own goal.) 
