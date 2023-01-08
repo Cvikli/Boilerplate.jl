@@ -32,7 +32,7 @@ push_ifne!(arr, elem) = (!(elem in arr) && push!(arr, elem))
 
 # Curried functions:
 Base.filter(f::Function) = L -> Base.filter(f, L)
-Base.map(f::Function) = L -> map(f, L)
+Base.map(f::Function)    = L -> map(f, L)
 
 # Base.:>(args::NTuple, f::Function) = f(args...)
 Base.reshape(s1::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1)
@@ -40,48 +40,43 @@ Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}) = arr::AbstractArray 
 Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1, s2, s3)
 Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int}, s4::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1, s2, s3, s4)
 
-map_array(fn::Function, arr::AbstractArray{Float32,N}) where {N,} = fn(arr)
-map_array(fn::Function, arr::Vector{Function}) = Vector{Function}(undef, length(arr))
-map_array(fn::Function, arr::AbstractArray{Int64,N}) where {N} = fn(arr)
-map_array(fn::Function, arr::Array{Array{Array{Float32,N},1},1}) where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Vector{T}) where {T} = [map_array(fn, v) for v in arr] # this is a less strict option.
-map_array(fn::Function, arr::Array{Array{Float32,N},1}) where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Array{Array{Int64,N},1}) where N = [map_array(fn, v) for v in arr]
+# To handle different nested array structs... Not comprehensive...
+map_array(fn::Function, arr::AbstractArray{Float32,N}) where {N} = fn(arr)
+map_array(fn::Function, arr::AbstractArray{Int64,N})   where {N} = fn(arr)
+map_array(fn::Function, arr::Vector{Function})                   = Vector{Function}(undef, length(arr))
+map_array(fn::Function, arr::Vector{T})                where {T} = [map_array(fn, v) for v in arr] # this is a less strict option.
+map_array(fn::Function, arr::Array{Array{Float32,N},1})  where N = [map_array(fn, v) for v in arr]
+map_array(fn::Function, arr::Array{Array{Int64,N},1})    where N = [map_array(fn, v) for v in arr]
 map_array(fn::Function, arr::Array{Array{Function,N},1}) where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Tuple{A}) where {A} = (map_array(fn, arr[1]),)
-map_array(fn::Function, arr::Tuple{A,B}) where {A,B} = (map_array(fn, arr[1]), map_array(fn, arr[2]))
-map_array(fn::Function, arr::Tuple{A,B,C}) where {A,B,C} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]))
-map_array(fn::Function, arr::Tuple{A,B,C,D}) where {A,B,C,D} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]))
-map_array(fn::Function, arr::Tuple{A,B,C,D,E}) where {A,B,C,D,E} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]))
+map_array(fn::Function, arr::Array{Array{Array{Float32,N},1},1}) where N = [map_array(fn, v) for v in arr]
+map_array(fn::Function, arr::Tuple{A})           where {A} = (map_array(fn, arr[1]),)
+map_array(fn::Function, arr::Tuple{A,B})         where {A,B} = (map_array(fn, arr[1]), map_array(fn, arr[2]))
+map_array(fn::Function, arr::Tuple{A,B,C})       where {A,B,C} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]))
+map_array(fn::Function, arr::Tuple{A,B,C,D})     where {A,B,C,D} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]))
+map_array(fn::Function, arr::Tuple{A,B,C,D,E})   where {A,B,C,D,E} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]))
 map_array(fn::Function, arr::Tuple{A,B,C,D,E,F}) where {A,B,C,D,E,F} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]), map_array(fn, arr[6]))
 map_array(fn::Function) = d -> map_array(fn, d)
 
 
 
 map_assign!(a, b::AbstractArray{Float32,N}) where {N} = a .= b
-map_assign!(a, b::AbstractArray{Function,1}) = Vector{Function}(undef, length(b))
-map_assign!(a, b::AbstractArray) =
-  for i = 1:length(b)
-    map_assign!(a[i], b[i])
-  end
-map_assign!(a, b::Tuple) =
-  for i = 1:length(b)
-    map_assign!(a[i], b[i])
-  end
+map_assign!(a, b::AbstractArray{Function,1})          = Vector{Function}(undef, length(b))
+map_assign!(a, b::AbstractArray)                      = for i = 1:length(b)  map_assign!(a[i], b[i]) end
+map_assign!(a, b::Tuple)                              = for i = 1:length(b) map_assign!(a[i], b[i]) end
 
-
-_sizes(arr::AbstractArray{Float64,N}) where {N} = (@info "Float64 in the arrays!!"; [size(arr)...])  # for GPU Float64 is terrible, I always note this! Redefine if you don't like it. 
-_sizes(arr::AbstractArray{Float32,N}) where {N} = [size(arr)...]
-_sizes(arr::AbstractArray{Int64,N}) where {N} = [size(arr)...]
-_sizes(arr::AbstractArray{UInt8,N}) where {N} = [size(arr)...]
+# THE size function! Extremly great!
+_sizes(arr::AbstractArray{Float64,N})  where {N} = (@info "Float64 in the arrays!!"; [size(arr)...])  # for GPU Float64 is terrible, I always note this! Redefine if you don't like it. 
+_sizes(arr::AbstractArray{Float32,N})  where {N} = [size(arr)...]
+_sizes(arr::AbstractArray{Int64,N})    where {N} = [size(arr)...]
+_sizes(arr::AbstractArray{UInt8,N})    where {N} = [size(arr)...]
 _sizes(arr::AbstractArray{Function,N}) where {N} = "Function$([size(arr)...])"
-_sizes(arr::AbstractArray) = (size(arr, 1) > 0 && length(_sizes(arr[1])) > 0 ? [size(arr)..., _sizes(arr[1])] : [size(arr)...])
-_sizes(tup::Tuple) = Tuple(sizes(obj) for obj in tup)
-_sizes(dict::Dict{Int,AbstractArray}) = Dict(key => sizes(value) for (key, value) in dict)
-_sizes(v::Int64) = "Int64"
-_sizes(v::Float64) = "Float64"
-_sizes(v::Int32) = "Int32"
-_sizes(v::Nothing) = "Nothing"
+_sizes(arr::AbstractArray)                       = (size(arr, 1) > 0 && length(_sizes(arr[1])) > 0 ? [size(arr)..., _sizes(arr[1])] : [size(arr)...])
+_sizes(dict::Dict{Int,AbstractArray})            = Dict(key => sizes(value) for (key, value) in dict)
+_sizes(tup::Tuple)   = Tuple(sizes(obj) for obj in tup)
+_sizes(v::Int64)     = "Int64"
+_sizes(v::Float64)   = "Float64"
+_sizes(v::Int32)     = "Int32"
+_sizes(v::Nothing)   = "Nothing"
 _sizes(v::T) where T = "$T"
 sizes(x) = replace(replace("$(_sizes(x))", "Any" => ""), "\""=>"")
 macro sizes(arr)
