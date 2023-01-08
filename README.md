@@ -5,13 +5,13 @@ Most of these are crazy useful function, should be adopted by the Base too.
 
 # Install
 ```
-] add RelevanceStacktrace
-using RelevanceStacktrace
+using Pkg; Pkg.add("Boilerplate")
+using Boilerplate
 ```
-or
+later on as it gets registered repository: 
 ```
-using Pkg; Pkg.add("RelevanceStacktrace")
-using RelevanceStacktrace
+] add Boilerplate
+using Boilerplate
 ```
 # Fast overview
 ```julia
