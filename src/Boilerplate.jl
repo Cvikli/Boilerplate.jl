@@ -256,4 +256,30 @@ macro dtime()
 	end
 end
 
+is_it_reproducible(syms::Vector) = for sym in syms is_it_reproducible(sym) end
+is_it_reproducible(sym::Symbol) = begin
+	global tracked
+	!(sym in keys(tracked)) && (println("$sym: doesn't exist!"); return)
+	length(tracked[sym]) < 2 && (println("$sym: isn't ready"); return)
+	is_last_two_similar(sym, tracked[sym][end], tracked[sym][end-1])
+end
+
+is_last_two_similar(sym, arr1, arr2) = begin
+	if is_similar(arr1, arr2)
+		println("$sym: ✔")
+	else
+		println("$sym: asymetry in the data! (something undef or seed wasn't set?)")
+	end
+end
+
+is_similar(arr1::AbstractArray{Float32,N}, arr2::AbstractArray{Float32,N}) where N = is_similar(Array(arr1), Array(arr2))
+is_similar(arr1::Array{Float32,N},         arr2::Array{Float32,N})         where N = all(isapprox.(arr1, arr2, rtol=3e-3))
+
+
+# - size(arr, dim)  if dim > rank(arr) , DO a FCKING ERROR PLS... Why we allow it!! OMG
+# - @code_warntype silent error has to be corrected!
+
+
+
+
 end  # modul Boilerplate
