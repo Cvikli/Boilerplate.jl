@@ -8,9 +8,9 @@ Most of these are crazy useful function, should be adopted by the Base too.
 using Pkg; Pkg.add("Boilerplate")
 using Boilerplate
 ```
-later on as it gets registered repository: 
+or from this repository: 
 ```
-] add Boilerplate
+] add https://github.com/Cvikli/Boilerplate.jl
 using Boilerplate
 ```
 # Fast overview
