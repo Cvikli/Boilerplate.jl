@@ -1,18 +1,20 @@
 # Boilerplate
-Enhance the productivity to even more! 
+**Enhance the productivity** till the skys! 
 
 Most of these are crazy useful function, should be adopted by the Base too.
 
 # Install
-] add RelevanceStacktrace
-using RelevanceStacktrace
-or
-
-using Pkg; Pkg.add("RelevanceStacktrace")
-using RelevanceStacktrace
-
+```
+using Pkg; Pkg.add(url="https://github.com/Cvikli/Boilerplate.jl")
+using Boilerplate
+```
+or from this repository: 
+```
+] add https://github.com/Cvikli/Boilerplate.jl
+using Boilerplate
+```
 # Fast overview
-'''
+```julia
 using Boilerplate
 
 # UNIVERSAL sizes! Really life saving in any situation! 
@@ -69,15 +71,22 @@ catch e
   showerror(stderr, e, bt)
   println()
 end
-sleep(0.3)
+sleep(1.3)
 println()
 println("These things actually make everything extremly fast to debug!")
-
-'''
+```
 
 # Why?
-@show is extremly useful due to you don't have to do paranthesis. It sounds like a minor thing, but actually this is key. Julia most important fast debug function has to adopt this style as it is extremly fast to type. (Of course in other language you use macros for this, but also that gives crazy amount of boilerplate code, which is cognitive burden and should be reduced as much as possible.) That is why @sizes and @typeof is also extremly useful. (Ofc, it could be standardised by community, as this is mainly for support my own goal.) 
+`@show` is extremly useful due to you don't have to do paranthesis. It sounds like a minor thing, but actually this is key. Julia most important fast debug function has to adopt this style as it is extremly fast to type. (Of course in other language you use macros for this, but also that gives crazy amount of boilerplate code, which is cognitive burden and should be reduced as much as possible.) That is why `@sizes` and `@typeof` is also extremly useful. (Ofc, it could be standardised by community, as this is mainly for support my own goal.) 
 
 Some of these boilerplate are so trivial, that it is already on the discourse.julia. I just copied some of them.
 
+# Contribute
+If you have any other useful Boilerplate code that automate some of the process or anything! Please don't hesitate to share! We help each other! ;)
 
+# Other productivity tools
+- Best stacktrace I am using: https://github.com/Cvikli/RelevanceStacktrace.jl Reduce the error search to ZERO! 
+- I will share a lot more. 
+   - I have a vscode plugin, that is also extremly useful, I cannot emphasize this. Sadly Python cannot do this this well like julia, actually this is the main reason julia is the best language of 2023. 
+   - sysimage creator that is also really great! Also that can precompile packages while keeping it modifiable from outside.
+   - PkgResolver system, that could be expanded and added to sysimage so it would automatically find the problem and resolve the package that is in development. This project goal is to reduce the problem to just running one script and resolve package issues.    
