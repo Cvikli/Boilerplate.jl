@@ -5,7 +5,7 @@ Most of these are crazy useful function, should be adopted by the Base too.
 
 # Install
 ```
-using Pkg; Pkg.add("Boilerplate")
+using Pkg; Pkg.add(url="https://github.com/Cvikli/Boilerplate.jl")
 using Boilerplate
 ```
 or from this repository: 
