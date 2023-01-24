@@ -13,12 +13,6 @@ export tracked
 export @track
 
 
-export len
-export enum
-len(a) = length(a)     # TODO remove...! Use Pythonish instead!!
-enum(x) = enumerate(x)
-
-
 returnparametric(x::Val{V}) where {V} = V  # I guess there is a simpler way... but for now this was enough.
 
 # It is just crazy how many time did I try to convert anything to string like this... Let's make it default...
@@ -165,10 +159,16 @@ throttle(delay_ms::Number) = (fn::Function) -> throttle(fn, delay_ms)
 
 
 global tracked = Dict()
+get_tracked() = begin
+	return tracked
+end
+# is_tracking_disabled() = true
+is_tracking_disabled() = false
 macro track(var, ex)
+	is_tracking_disabled() && return esc(ex)
 	res = gensym()
 	var_sym = var
-	esc(quote
+	return esc(quote
 			$res = $ex;
 			!($var_sym in keys(tracked)) && (tracked[$var_sym] = typeof($res)[]);
 			push!(tracked[$var_sym], $res)
@@ -256,14 +256,14 @@ macro dtime()
 	end
 end
 
-is_it_reproducible(syms::Matrix; silent=false) = is_it_reproducible(syms, silent)
-is_it_reproducible(syms::Matrix, silent=false) = is_it_reproducible.(syms, silent)
+is_it_reproducible(syms::Matrix{Symbol}; silent=false) = is_it_reproducible(syms, silent)
+is_it_reproducible(syms::Matrix{Symbol}, silent) = is_it_reproducible.(syms, silent)
 
-is_it_reproducible(syms::Vector; silent=false) = is_it_reproducible(syms, silent)
-is_it_reproducible(syms::Vector, silent=false) = is_it_reproducible.(syms, silent)
+is_it_reproducible(syms::Vector{Symbol}; silent=false) = is_it_reproducible(syms, silent)
+is_it_reproducible(syms::Vector{Symbol}, silent) = is_it_reproducible.(syms, silent)
 
 is_it_reproducible(sym::Symbol; silent=false) = is_it_reproducible(sym, silent)
-is_it_reproducible(sym::Symbol, silent=false) = begin
+is_it_reproducible(sym::Symbol, silent) = begin
 	global tracked
 	!(sym in keys(tracked)) && ((!silent && println("$sym: doesn't exist!")); return 3)
 	length(tracked[sym]) < 2 && ((!silent && println("$sym: isn't ready")); return 2)
