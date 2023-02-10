@@ -292,6 +292,7 @@ is_similar(v1::Int,     v2::Int)      = v1 == v2
 # - size(arr, dim)  if dim > rank(arr) , DO a FCKING ERROR PLS... Why we allow it!! OMG
 # - @code_warntype silent error has to be corrected!
 
+available_memory() = parse(Int, String(read(`grep MemAvailable /proc/meminfo`))[14:end-3])
 
 
 
