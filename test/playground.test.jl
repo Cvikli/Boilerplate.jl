@@ -34,3 +34,10 @@ using Boilerplate: tracked
 @show tracked
 tracked
 
+
+#%%
+println(3,4,5, sep=", ")
+#%%
+using Base
+Base.println(args...; sep) = println(join(args, sep), sep="")
+println(3,4,5,6; sep=", ") 

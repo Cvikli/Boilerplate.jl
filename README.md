@@ -19,7 +19,7 @@ using Boilerplate
 
 # UNIVERSAL sizes! Really life saving in any situation! 
 a2 = [100,3,4,2]
-a1 = (randn(Float32, 100,4,2),a2,(rand(1:10,100,5), randn(Float32,100,9)))
+a1 = (randn(Float32, 2,4,2),a2,(rand(1:10,100,5), randn(Float32,100,9)))
 
 @sizes a1 
 
@@ -40,6 +40,8 @@ fn(3)
 @display q = randn(6,3)
 
 using Boilerplate: push_ifne!, findfirst_typed, idxI, @get, @asyncsafe
+
+fieldnames(a1)  # instead of fieldnames(typeof(a1))  # I know 99% of us used it wrong at first because this could have been so evident this way... 
 
 push_ifne!(a2, 3)
 push_ifne!(a2, 4) # Push if not exists

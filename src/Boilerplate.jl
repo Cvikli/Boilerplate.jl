@@ -3,20 +3,30 @@ using Base
 
 # include("./Testing.jl")
 
-hello() = println("Hey! I am here, with you!")
-
 export @sizes
 export @typeof
 export @display
+export @println
 
 export tracked
 export @track
 
 
-returnparametric(x::Val{V}) where {V} = V  # I guess there is a simpler way... but for now this was enough.
+# - size(arr, dim)  if dim > rank(arr) , DO a FCKING ERROR PLS... Why we allow it!! OMG
+# - @code_warntype silent error has to be corrected!
+
+
+get_parametric(x::Val{P}) where P = P  # I guess there is a simpler way... but for now this was enough.
 
 # It is just crazy how many time did I try to convert anything to string like this... Let's make it default...
 Base.String(x) = "$x" 
+
+
+
+# LIKE WHY this isn't default! :D
+Base.fieldnames(x::Any)             = fieldnames(typeof(x))    # In case of Any we need runtime information... I guess this should work like this 
+Base.fieldnames(x::TYPE) where TYPE = fieldnames(TYPE)         # If we have compile time information other than Any then we could use things like this? 
+# Base.fieldnames(x) = fieldnames(typeof(x))  # general... 
 
 # I hate lambda functions sometime...
 noop(vargs...) = nothing 
@@ -27,28 +37,26 @@ push_ifne!(arr, elem) = (!(elem in arr) && push!(arr, elem))
 # Curried functions:
 Base.filter(f::Function) = L -> Base.filter(f, L)
 Base.map(f::Function)    = L -> map(f, L)
+Base.reshape(s1::Union{Colon, Int})                                                                      = arr -> reshape(arr, s1)
+Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int})                                               = arr -> reshape(arr, s1, s2)
+Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int})                        = arr -> reshape(arr, s1, s2, s3)
+Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int}, s4::Union{Colon, Int}) = arr -> reshape(arr, s1, s2, s3, s4)
 
-# Base.:>(args::NTuple, f::Function) = f(args...)
-Base.reshape(s1::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1)
-Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1, s2)
-Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1, s2, s3)
-Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int}, s4::Union{Colon, Int}) = arr::AbstractArray -> reshape(arr, s1, s2, s3, s4)
-
-# To handle different nested array structs... Not comprehensive...
-map_array(fn::Function, arr::AbstractArray{Float32,N}) where {N} = fn(arr)
-map_array(fn::Function, arr::AbstractArray{Int64,N})   where {N} = fn(arr)
-map_array(fn::Function, arr::Vector{Function})                   = Vector{Function}(undef, length(arr))
-map_array(fn::Function, arr::Vector{T})                where {T} = [map_array(fn, v) for v in arr] # this is a less strict option.
-map_array(fn::Function, arr::Array{Array{Float32,N},1})  where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Array{Array{Int64,N},1})    where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Array{Array{Function,N},1}) where N = [map_array(fn, v) for v in arr]
+# To handle different nested array structs... Not comprehensive... be noted!
+map_array(fn::Function, arr::AbstractArray{Float32,N})           where N = fn(arr)
+map_array(fn::Function, arr::AbstractArray{Int64,N})             where N = fn(arr)
+map_array(fn::Function, arr::Vector{Function})                           = Vector{Function}(undef, length(arr))
+map_array(fn::Function, arr::Vector{T})                          where T = [map_array(fn, v) for v in arr] # this is a less strict option.
+map_array(fn::Function, arr::Array{Array{Float32,N},1})          where N = [map_array(fn, v) for v in arr]
+map_array(fn::Function, arr::Array{Array{Int64,N},1})            where N = [map_array(fn, v) for v in arr]
+map_array(fn::Function, arr::Array{Array{Function,N},1})         where N = [map_array(fn, v) for v in arr]
 map_array(fn::Function, arr::Array{Array{Array{Float32,N},1},1}) where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Tuple{A})           where {A} = (map_array(fn, arr[1]),)
-map_array(fn::Function, arr::Tuple{A,B})         where {A,B} = (map_array(fn, arr[1]), map_array(fn, arr[2]))
-map_array(fn::Function, arr::Tuple{A,B,C})       where {A,B,C} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]))
-map_array(fn::Function, arr::Tuple{A,B,C,D})     where {A,B,C,D} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]))
-map_array(fn::Function, arr::Tuple{A,B,C,D,E})   where {A,B,C,D,E} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]))
-map_array(fn::Function, arr::Tuple{A,B,C,D,E,F}) where {A,B,C,D,E,F} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]), map_array(fn, arr[6]))
+map_array(fn::Function, arr::Tuple{A})               where {A}           = (map_array(fn, arr[1]),)
+map_array(fn::Function, arr::Tuple{A,B})             where {A,B}         = (map_array(fn, arr[1]), map_array(fn, arr[2]))
+map_array(fn::Function, arr::Tuple{A,B,C})           where {A,B,C}       = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]))
+map_array(fn::Function, arr::Tuple{A,B,C,D})         where {A,B,C,D}     = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]))
+map_array(fn::Function, arr::Tuple{A,B,C,D,E})       where {A,B,C,D,E}   = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]))
+map_array(fn::Function, arr::Tuple{A,B,C,D,E,F})     where {A,B,C,D,E,F} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]), map_array(fn, arr[6]))
 map_array(fn::Function) = d -> map_array(fn, d)
 
 
@@ -97,7 +105,7 @@ findfirst_typed(fn::Function, A) = (for (i, a) in enumerate(A)
 end; return -1)
 
 idxI(arr,i) = [a[i] for a in arr]
-
+# TODO... @get arrayobj.[...]
 macro get(indexing)  # indexing of Dict... @get dictobj.["TD3_MINI", "TD5_BIG"]
 	indexing.head ≠ :. && error("syntax: expected: `d.[ks...]`.")
 	dict = indexing.args[1]
@@ -107,63 +115,24 @@ macro get(indexing)  # indexing of Dict... @get dictobj.["TD3_MINI", "TD5_BIG"]
 	indexing
 end
 
-function getfirst(pred, itr)
-  for elt = itr
-      if pred(elt)
-          return elt
-      end
-  end
-  nothing
-end
-
 
 macro async_showerr(ex)
-	quote
-		t = @async try
-			eval($(esc(ex)))
-		catch err
-			bt = catch_backtrace()
-			println()
-			showerror(stderr, err, bt)
-		end
-	end
-end
-macro asyncsafe(ex)
 	quote 
 		@async try
 			$(esc(ex))
 		catch err
-			bt = catch_backtrace()
 			println()
-			showerror(stderr, err, bt)
+			showerror(stderr, err, catch_backtrace())
 			println()
 		end
 	end
 end
-throttle(fn::Function, delay_ms::Number) = begin
-	c = Channel(100)
-	counter = 0
-	(args...; kw...) -> begin
-		# @asyncsafe begin
-		# 	counter += 1
-		# 	fn_c = counter
-		# 	sleep(delay_ms / 1000)
-		# 	if counter !== fn_c
-		# 		return
-		# 	end
-		# 	fn(args..., kw...)
-    # end
-	end
-end
-throttle(delay_ms::Number) = (fn::Function) -> throttle(fn, delay_ms)
-
 
 global tracked = Dict()
-get_tracked() = begin
-	return tracked
-end
-# is_tracking_disabled() = true
-is_tracking_disabled() = false
+get_tracked() = (global tracked; return tracked)
+
+is_tracking_disabled() = true  # code has to be rebuilt!
+# is_tracking_disabled() = false  # code has to be rebuilt!
 macro track(var, ex)
 	is_tracking_disabled() && return esc(ex)
 	res = gensym()
@@ -175,50 +144,12 @@ macro track(var, ex)
 			$res
 	end)
 end
-macro monitor(functioncall, timer, testtipe)
-	res = gensym()
-	return esc(quote
-		if TI_UP() 
-			$timer = time() 
-		end 
-		$res = $functioncall 
-		if TI_UP() 
-			dprint(rpad($testtipe,12), fp_2_str(($timer=time()-$timer;)*1000_000),"µs") 
-		end 
-		$res
-	end)
-end
-macro monitor(functioncall, timer, testtipe, vars, ranges)
-	res = gensym()
-	blk = Expr(:block)
-	for ex in vars.args
-			push!(blk.args, :($(sprint(print,ex))))
-	end
-	isempty(vars.args) || push!(blk.args, :value)
-	return esc(quote
-		if TI_UP() 
-			$timer = time() 
-		end 
-		$res = $functioncall 
-		if TI_UP() 
-			dprint(rpad($testtipe,12), fp_2_str(($timer=time()-$timer;)*1000_000),"µs") 
-		end 
-		if NAN_CHECK() 
-			nan_catcher(a, $vars, $(blk.args), $ranges, eᵢ) 
-		end
-		$res
-	end)
-end
+
+
 
 macro display(ex)
 	esc(quote
-		# $Zygote.@ignore begin
-			# Zygote.@ignore show(stdout, "text/plain", $ex)
-			# @show $ex
-			# :(println($ex))
-			# print($(sprint(Base.show_unquoted, ex)*" = "))
 			display($ex)
-		# end
 	end)
 end
 macro println(ex)
@@ -236,11 +167,20 @@ clear_line_up() = begin
 	#Cursor position does not change. 
 end
 
-equalize(arrs...) = begin
-  ww = minimum(length.(arrs))
-	for arr in arrs
-		while length(arr) > ww; pop!(arr) end
+@inline equalize(args...)             = equalize(args)
+@inline equalize(args::AbstractArray) = begin
+  common_size = minimum(length.(args))
+	for i in eachindex(args)
+		common_size != length(args[i]) && (args[i] = args[i][1:common_size])
 	end
+	args
+end
+@inline equalize(args::T)     where T = begin
+  common_size = minimum(length.(arrs))
+  (common_size != length(a) ? a[1:common_size] : a for a in args)
+end
+macro equalize(expr)
+  esc(:($expr = equalize($expr)))
 end
 
 
@@ -283,14 +223,12 @@ end
 is_similar(arr1::AbstractArray{Int,N},     arr2::AbstractArray{Int,N})     where N = is_similar(Array(arr1), Array(arr2))
 is_similar(arr1::AbstractArray{Float32,N}, arr2::AbstractArray{Float32,N}) where N = is_similar(Array(arr1), Array(arr2))
 is_similar(arr1::Array{Int,N},             arr2::Array{Int,N})             where N = all(arr1 .== arr2)
-is_similar(arr1::Vector{Int32},              arr2::Vector{Int32})                  = all(arr1 .== arr2)
+is_similar(arr1::Vector{Int32},            arr2::Vector{Int32})                    = all(arr1 .== arr2)
 is_similar(arr1::Array{Float32,N},         arr2::Array{Float32,N})         where N = all(isapprox.(arr1, arr2, rtol=3e-3))
 is_similar(v1::Float32, v2::Float32)  = isapprox(v1, v2, rtol=3e-3)
 is_similar(v1::Int,     v2::Int)      = v1 == v2
 
 
-# - size(arr, dim)  if dim > rank(arr) , DO a FCKING ERROR PLS... Why we allow it!! OMG
-# - @code_warntype silent error has to be corrected!
 
 available_memory() = parse(Int, String(read(`grep MemAvailable /proc/meminfo`))[14:end-3])
 
