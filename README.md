@@ -1,7 +1,7 @@
 # Boilerplate
-**Enhance the productivity** till the skys! 
+**Enhance the productivity** till the skies! 
 
-Most of these are crazy useful function, should be adopted by the Base too.
+Most of these are crazy useful functions and would be a welcome addition to the Base.
 
 # Install
 ```
@@ -17,53 +17,54 @@ using Boilerplate
 ```julia
 using Boilerplate
 
-# UNIVERSAL sizes! Really life saving in any situation! 
 a2 = [100,3,4,2]
 a1 = (randn(Float32, 2,4,2),a2,(rand(1:10,100,5), randn(Float32,100,9)))
 
+# UNIVERSAL sizes! Extremely handy in any situation! 
 @sizes a1 
 
-# macro typeof! Simplest way lie @show!
+# macro typeof! It's as simple as @show!
 @typeof a1
 
 # TRACK anything anytime!
 fn(x) = begin
   y=x+8+x*x
-  @track :y y  # Suppose the y is a REALLY important and complex structure that you just don't want to return  throught the functions, just for debug purpose. "Let's track!"
+  @track :y y  # Suppose the y is a REALLY important and complex structure that you just don't want to return through the functions, just for debug purposes. Simply track it!
   z=y * (x + 4)
   return z
 end
 fn(3)
-@show tracked[:y] # It is an array, so we track every single value that is pushed into it, we just have to know which one are we looking for.
+@show tracked[:y] # It's a dict, in which we track every single value we pushed into it, we just have to know which key did we push our tracked variables.
 
-# beautiful print!
+# Beautiful print!
 @display q = randn(6,3)
 
 using Boilerplate: push_ifne!, findfirst_typed, idxI, @get, @asyncsafe
 
-fieldnames(a1)  # instead of fieldnames(typeof(a1))  # I know 99% of us used it wrong at first because this could have been so evident this way... 
+fieldnames(a1)  # This is equvalent to fieldnames(typeof(a1))  # I believe 99% of us used it wrong at first because this could have been so evident this way... 
 
 push_ifne!(a2, 3)
 push_ifne!(a2, 4) # Push if not exists
 @show a2
 
-# findfirst with that Nothing.... is just very big antipattern, let's just use this instead! I love type stability, so I don't like when something is ambiguous.
-@show findfirst_typed(==(7), a2)  # ==(7)  is actually v->v==7 (if someone didn't know)
-# I think actually findfirst should be renamed to findfirstsafe or something that means it is a different findfirst then in any other language. (Of course it is beautiful stuff, but sounds like an antipattern)
+# findfirst with that 'Nothing' is just a big antipattern, let's just use this instead! I love type stability, and also compilers so whynot use unstable codes with little to no drawbacks.
+@show findfirst_typed(==(7), a2)  # ==(7)  is actually v->v==7
+# I think actually findfirst should be renamed to findfirst_safe or something that means it is a different findfirst than in any other languages. (Of course, it is beautiful stuff, but sounds like an antipattern)
 
-# and never forget about that we have @edit which is one of the most powerful tool of Julia too!
+# and never forget that we have @edit which is one of the most powerful tools of Julia too!
 
-a3 = idxI.(a1, 1) # of course it isn't that beautiful syntax... but isn't used frequently anyways! It also works from Vector{Matrix[Float32]} or anything...
+a3 = idxI.(a1, 1) # of course it isn't that beautiful syntax... but isn't used frequently anyways! It also works with Vector{Matrix[Float32]} or anything...
 @typeof a3
 @sizes a3
 
 @get tracked.[:y, :y]   # get multiple values from dict like from the arrays in a beautiful way!
+
 fn2(x) = begin
   println(x)
   sleep(x)
 end
 
-@async fn2("0.2") # DANGER! In certain situation there are actually no error... silent errors are the deadliest enemies. Has to be zeroed! 
+@async fn2("0.2") # CAUTION! Errors in @async are not printed anywhere, things just die... Silent errors are the deadliest enemies. Has to be zeroed! I guess everyone has been there already with @async and everyone simply fixed for themselves.
 @asyncsafe fn2(0.1)
 try 
   @asyncsafe fn2("0.2")
@@ -78,17 +79,20 @@ println()
 println("These things actually make everything extremly fast to debug!")
 ```
 
-# Why?
-`@show` is extremly useful due to you don't have to do paranthesis. It sounds like a minor thing, but actually this is key. Julia most important fast debug function has to adopt this style as it is extremly fast to type. (Of course in other language you use macros for this, but also that gives crazy amount of boilerplate code, which is cognitive burden and should be reduced as much as possible.) That is why `@sizes` and `@typeof` is also extremly useful. (Ofc, it could be standardised by community, as this is mainly for support my own goal.) 
+# Why Use Boilerplate?
+`@show` is extremly useful because it eliminates the need for parentheses. While this might seem minor, it's crucial for quick typing. Julia's most important debugging function should adopt this style as it's super fast to type. (Of course in other languages you use macros for this, but also that gives a crazy amount of boilerplate code, which is a cognitive burden and should be reduced as much as possible.) That is why `@sizes` and `@typeof` is also extremely useful. 
+(Ofc, it could be standardised by community, as this is mainly for support my own goal.)
 
-Some of these boilerplate are so trivial, that it is already on the discourse.julia. I just copied some of them.
+
+Some of these boilerplates are so trivial, that they're already on discourse.julia. I've just copied some of them.
 
 # Contribute
-If you have any other useful Boilerplate code that automate some of the process or anything! Please don't hesitate to share! We help each other! ;)
+If you have any other useful Boilerplate code that automates development processes or anything! Please don't hesitate to share! We help each other! ;)
 
-# Other productivity tools
+# Other Productivity Tools
+Here are some other productivity tools I recommend:
 - Best stacktrace I am using: https://github.com/Cvikli/RelevanceStacktrace.jl Reduce the error search to ZERO! 
 - I will share a lot more. 
-   - I have a vscode plugin, that is also extremly useful, I cannot emphasize this. Sadly Python cannot do this this well like julia, actually this is the main reason julia is the best language of 2023. 
-   - sysimage creator that is also really great! Also that can precompile packages while keeping it modifiable from outside.
-   - PkgResolver system, that could be expanded and added to sysimage so it would automatically find the problem and resolve the package that is in development. This project goal is to reduce the problem to just running one script and resolve package issues.    
+- I have a fork of the julia-vscode plugin, that is also extremly useful, I cannot emphasize this. Sadly Python cannot do this this well like julia, actually this is the main reason julia is the best language of 2023. 
+- sysimage creator that is also really great! Also that can precompile packages while keeping it modifiable from outside. As of julia 1.9 version is out, this is less of a big deal.
+- PkgResolver package, that could be expanded and added to sysimage so it would automatically find the problem and resolve packages added with "add" and "dev". This project's goal is to reduce the problem of package resolving to just running one simple script.    
