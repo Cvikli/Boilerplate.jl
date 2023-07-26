@@ -1,40 +1,38 @@
+# Julia productivity enhancement with Boilerplate.jl
+using Boilerplate
 
-using RelevanceStacktrace
+#%%
 using MLDatasets
 
 # load full training set (I already downloaded them)
 train_x, train_y = MNIST()[:]
+rnd_data = (randn(Float32, 2,4,2),"a2",rand(1:10,10,4))
 
-#%%
-# we want to understand the underlying data
-using Boilerplate
-
-#%%
+#%%  we want to understand the underlying data
 @sizes train_x
 @sizes train_y
-
+@sizes rnd_data
+;
 #%%
 @typeof train_x
+@typeof rnd_data
+;
 #%%
 
-@display train_x[3:23,6:16,1:2]
-#%%
-#%%
-q=5
-@show q
-@println q
+@display train_x[3:23,6:16,1:1]
+
 
 #%%
-using Boilerplate: fieldnames, findfirst_typed
+using Boilerplate: fieldnames
 a1 = (randn(Float32, 2,4,2),"a2",rand(1:10,100,5))
 fieldnames(a1)
 
 #%%
-
+using Boilerplate: findfirst_typed
 findfirst_typed(>(0.99), train_x)
 
 #%%
-using Boilerplate: @async_showerr
+using Boilerplate: @asyncsafe
 
 fn() = begin
 	sleep(2) 
@@ -46,16 +44,16 @@ t = @async fn()
 #%%
 t
 #%%
-@async_showerr fn()
+@asyncsafe fn()
 #%%
 using Boilerplate: @track
 gn() = begin
 	sleep(2) 
-	@track :ok 5*5*5*3*rand()
+	@track :ok 5*5*5*3*rand()  # <------
 	println("Ready...")
 	return 3
 end
-@async_showerr gn()
+@asyncsafe gn()
 
 #%%
 using Boilerplate: tracked
@@ -64,6 +62,7 @@ tracked[:ok]
 
 #%%
 
+String(rnd_data)  # "$rnd_data"
 
 
 

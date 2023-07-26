@@ -106,13 +106,15 @@ end; return -1)
 
 idxI(arr,i) = [a[i] for a in arr]
 # TODO... @get arrayobj.[...]
-macro get(indexing)  # indexing of Dict... @get dictobj.["TD3_MINI", "TD5_BIG"]
-	indexing.head ≠ :. && error("syntax: expected: `d.[ks...]`.")
-	dict = indexing.args[1]
-	indexing.args[1] = :getindex
-	indexing.args[2].head = :tuple
-	indexing.args[2].args = [Expr(:tuple, dict); indexing.args[2].args]
-	indexing
+macro get(obj)  # obj of Dict... @get dictobj.["TD3_MINI", "TD5_BIG"]
+	obj.head ≠ :. && error("syntax: expected: `dictionary.[keys...]`.")
+		dict_obj = ((obj.args[1]))
+		dict_keys = ((obj.args[2].args[1].args))
+		println(obj)
+		println(dict_obj)
+		println(dict_keys)
+		
+		:([$dict_obj[k] for k in $dict_keys])
 end
 
 
@@ -127,12 +129,17 @@ macro async_showerr(ex)
 		end
 	end
 end
+macro asyncsafe(ex) 
+	quote 
+		@async_showerr $(esc(ex))
+	end
+end
 
 global tracked = Dict()
 get_tracked() = (global tracked; return tracked)
 
-is_tracking_disabled() = true  # code has to be rebuilt!
-# is_tracking_disabled() = false  # code has to be rebuilt!
+# is_tracking_disabled() = true  # code has to be rebuilt!
+is_tracking_disabled() = false  # code has to be rebuilt!
 macro track(var, ex)
 	is_tracking_disabled() && return esc(ex)
 	res = gensym()
