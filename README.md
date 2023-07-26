@@ -1,5 +1,5 @@
 # Boilerplate
-**Enhance the productivity** till the skies! 
+**Enhance productivity** to the skies and beyond! 
 
 Most of these are crazy useful functions and would be a welcome addition to the Base.
 
@@ -13,7 +13,7 @@ or from this repository:
 ] add https://github.com/Cvikli/Boilerplate.jl
 using Boilerplate
 ```
-# Fast overview
+# Quick Overview
 ```julia
 using Boilerplate
 
@@ -91,7 +91,7 @@ If you have any other useful Boilerplate code that automates development process
 
 # Other Productivity Tools
 Here are some other productivity tools I recommend:
-- Best stacktrace I am using: https://github.com/Cvikli/RelevanceStacktrace.jl Reduce the error search to ZERO! 
+- Best stacktrace I am using: https://github.com/Cvikli/RelevanceStacktrace.jl Reduce the error search to ZERO! JuliaSyntax.jl will give us even more possibilities.
 - I will share a lot more. 
 - I have a fork of the julia-vscode plugin, that is also extremly useful, I cannot emphasize this. Sadly Python cannot do this this well like julia, actually this is the main reason julia is the best language of 2023. 
 - sysimage creator that is also really great! Also that can precompile packages while keeping it modifiable from outside. As of julia 1.9 version is out, this is less of a big deal.
