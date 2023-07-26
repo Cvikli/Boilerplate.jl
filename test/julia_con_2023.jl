@@ -24,8 +24,14 @@ rnd_data = (randn(Float32, 2,4,2),"a2",rand(1:10,10,4))
 
 #%%
 using Boilerplate: fieldnames
-a1 = (randn(Float32, 2,4,2),"a2",rand(1:10,100,5))
-fieldnames(a1)
+struct Param
+	Δt::Float64 
+	n::Int64
+	m::Int64
+end
+
+P = Param(0.1, 50, 35)
+fieldnames(P)  # fieldnames(typeof(P))
 
 #%%
 using Boilerplate: findfirst_typed
@@ -48,12 +54,13 @@ t
 #%%
 using Boilerplate: @track
 gn() = begin
-	sleep(2) 
-	@track :ok 5*5*5*3*rand()  # <------
+	sleep(0.2) 
+	THE_NUMBER = 5*5*5*3*rand()
+	@track :ok THE_NUMBER  # <------
 	println("Ready...")
 	return 3
 end
-@asyncsafe gn()
+gn()
 
 #%%
 using Boilerplate: tracked
