@@ -7,6 +7,8 @@ using MLDatasets
 # load full training set (I already downloaded them)
 train_x, train_y = MNIST()[:]
 rnd_data = (randn(Float32, 2,4,2),"a2",rand(1:10,10,4))
+println("Loaded!")
+;
 
 #%%  we want to understand the underlying data
 @sizes train_x
@@ -38,7 +40,6 @@ using Boilerplate: findfirst_typed
 findfirst_typed(>(0.99), train_x)
 
 #%%
-using Boilerplate: @asyncsafe
 
 fn() = begin
 	sleep(2) 
@@ -50,26 +51,12 @@ t = @async fn()
 #%%
 t
 #%%
+using Boilerplate: @asyncsafe
 @asyncsafe fn()
 #%%
-using Boilerplate: @track
-gn() = begin
-	sleep(0.2) 
-	THE_NUMBER = 5*5*5*3*rand()
-	@track :ok THE_NUMBER  # <------
-	println("Ready...")
-	return 3
-end
-gn()
-
-#%%
-using Boilerplate: tracked
-tracked[:ok]
-
-
 #%%
 
-String(rnd_data)  # "$rnd_data"
+String(P)  # "$P"
 
 
 

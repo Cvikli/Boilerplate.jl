@@ -135,24 +135,6 @@ macro asyncsafe(ex)
 	end
 end
 
-global tracked = Dict()
-get_tracked() = (global tracked; return tracked)
-
-# is_tracking_disabled() = true  # code has to be rebuilt!
-is_tracking_disabled() = false  # code has to be rebuilt!
-macro track(var, ex)
-	is_tracking_disabled() && return esc(ex)
-	res = gensym()
-	var_sym = var
-	return esc(quote
-			$res = $ex;
-			!($var_sym in keys(tracked)) && (tracked[$var_sym] = typeof($res)[]);
-			push!(tracked[$var_sym], $res)
-			$res
-	end)
-end
-
-
 
 macro display(ex)
 	esc(quote
