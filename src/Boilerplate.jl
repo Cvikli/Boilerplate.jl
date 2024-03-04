@@ -25,7 +25,7 @@ Base.String(x) = "$x"
 
 # LIKE WHY this isn't default! :D
 Base.fieldnames(x::Any)             = fieldnames(typeof(x))    # In case of Any we need runtime information... I guess this should work like this 
-Base.fieldnames(x::TYPE) where TYPE = fieldnames(TYPE)         # If we have compile time information other than Any then we could use things like this? 
+# Base.fieldnames(x::Type{TYPE}) where TYPE = fieldnames(TYPE)         # If we have compile time information other than Any then we could use things like this? 
 # Base.fieldnames(x) = fieldnames(typeof(x))  # general... 
 
 # I hate lambda functions sometime...
