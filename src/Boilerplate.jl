@@ -8,9 +8,6 @@ export @typeof
 export @display
 export @println
 
-export tracked
-export @track
-
 
 # - size(arr, dim)  if dim > rank(arr) , DO a FCKING ERROR PLS... Why we allow it!! OMG
 # - @code_warntype silent error has to be corrected!
@@ -184,38 +181,6 @@ macro dtime()
 		esc($dtt = $nt)
 	end
 end
-
-is_it_reproducible(syms::Matrix{Symbol}; silent=false) = is_it_reproducible(syms, silent)
-is_it_reproducible(syms::Matrix{Symbol}, silent) = is_it_reproducible.(syms, silent)
-
-is_it_reproducible(syms::Vector{Symbol}; silent=false) = is_it_reproducible(syms, silent)
-is_it_reproducible(syms::Vector{Symbol}, silent) = is_it_reproducible.(syms, silent)
-
-is_it_reproducible(sym::Symbol; silent=false) = is_it_reproducible(sym, silent)
-is_it_reproducible(sym::Symbol, silent) = begin
-	global tracked
-	!(sym in keys(tracked)) && ((!silent && println("$sym: doesn't exist!")); return 3)
-	length(tracked[sym]) < 2 && ((!silent && println("$sym: isn't ready")); return 2)
-	is_last_two_similar(sym, tracked[sym][end], tracked[sym][end-1], silent)
-end
-
-is_last_two_similar(sym, arr1, arr2, silent) = begin
-	if is_similar(arr1, arr2)
-		!silent && println("$sym: ✔")
-		return 1
-	else
-		!silent && println("$sym: asymetry in the data! (something undef or seed wasn't set?)")
-		return 0
-	end
-end
-
-is_similar(arr1::AbstractArray{Int,N},     arr2::AbstractArray{Int,N})     where N = is_similar(Array(arr1), Array(arr2))
-is_similar(arr1::AbstractArray{Float32,N}, arr2::AbstractArray{Float32,N}) where N = is_similar(Array(arr1), Array(arr2))
-is_similar(arr1::Array{Int,N},             arr2::Array{Int,N})             where N = all(arr1 .== arr2)
-is_similar(arr1::Vector{Int32},            arr2::Vector{Int32})                    = all(arr1 .== arr2)
-is_similar(arr1::Array{Float32,N},         arr2::Array{Float32,N})         where N = all(isapprox.(arr1, arr2, rtol=3e-3))
-is_similar(v1::Float32, v2::Float32)  = isapprox(v1, v2, rtol=3e-3)
-is_similar(v1::Int,     v2::Int)      = v1 == v2
 
 
 
