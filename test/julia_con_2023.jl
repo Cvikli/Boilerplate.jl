@@ -51,8 +51,8 @@ t = @async fn()
 #%%
 t
 #%%
-using Boilerplate: @asyncsafe
-@asyncsafe fn()
+using Boilerplate: @async_showerr
+@async_showerr fn()
 #%%
 #%%
 

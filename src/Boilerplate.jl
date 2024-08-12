@@ -21,29 +21,7 @@ noop(vargs...) = nothing
 push_ifne!(arr, elem) = (!(elem in arr) && push!(arr, elem))
 
 
-# To handle different nested array structs... Not comprehensive... be noted!
-map_array(fn::Function, arr::AbstractArray{Float32,N})           where N = fn(arr)
-map_array(fn::Function, arr::AbstractArray{Int64,N})             where N = fn(arr)
-map_array(fn::Function, arr::Vector{Function})                           = Vector{Function}(undef, length(arr))
-map_array(fn::Function, arr::Vector{T})                          where T = [map_array(fn, v) for v in arr] # this is a less strict option.
-map_array(fn::Function, arr::Array{Array{Float32,N},1})          where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Array{Array{Int64,N},1})            where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Array{Array{Function,N},1})         where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Array{Array{Array{Float32,N},1},1}) where N = [map_array(fn, v) for v in arr]
-map_array(fn::Function, arr::Tuple{A})               where {A}           = (map_array(fn, arr[1]),)
-map_array(fn::Function, arr::Tuple{A,B})             where {A,B}         = (map_array(fn, arr[1]), map_array(fn, arr[2]))
-map_array(fn::Function, arr::Tuple{A,B,C})           where {A,B,C}       = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]))
-map_array(fn::Function, arr::Tuple{A,B,C,D})         where {A,B,C,D}     = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]))
-map_array(fn::Function, arr::Tuple{A,B,C,D,E})       where {A,B,C,D,E}   = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]))
-map_array(fn::Function, arr::Tuple{A,B,C,D,E,F})     where {A,B,C,D,E,F} = (map_array(fn, arr[1]), map_array(fn, arr[2]), map_array(fn, arr[3]), map_array(fn, arr[4]), map_array(fn, arr[5]), map_array(fn, arr[6]))
-map_array(fn::Function) = d -> map_array(fn, d)
 
-
-
-map_assign!(a, b::AbstractArray{Float32,N}) where {N} = a .= b
-map_assign!(a, b::AbstractArray{Function,1})          = Vector{Function}(undef, length(b))
-map_assign!(a, b::AbstractArray)                      = for i = 1:length(b)  map_assign!(a[i], b[i]) end
-map_assign!(a, b::Tuple)                              = for i = 1:length(b) map_assign!(a[i], b[i]) end
 
 # THE size function! Extremly great!
 _sizes(arr::AbstractArray{Float64,N})  where {N} = (@info "Float64 in the arrays!!"; [size(arr)...])  # for GPU Float64 is terrible, I always note this! Redefine if you don't like it. 
@@ -84,17 +62,6 @@ findfirst_typed(fn::Function, A) = (for (i, a) in enumerate(A)
 end; return -1)
 
 idxI(arr,i) = [a[i] for a in arr]
-# TODO... @get arrayobj.[...]
-macro get(obj)  # obj of Dict... @get dictobj.["TD3_MINI", "TD5_BIG"]
-	obj.head ≠ :. && error("syntax: expected: `dictionary.[keys...]`.")
-		dict_obj = ((obj.args[1]))
-		dict_keys = ((obj.args[2].args[1].args))
-		println(obj)
-		println(dict_obj)
-		println(dict_keys)
-		
-		:([$dict_obj[k] for k in $dict_keys])
-end
 
 
 macro async_showerr(ex)
@@ -129,27 +96,8 @@ end
 clear_line_up() = begin  
 	print("\u1b[1F") #Moves cursor to beginning of the line n (default 1) lines up  
 	print("\u1b[2K") # clears  part of the line.
-	#If n is 0 (or missing), clear from cursor to the end of the line. 
-	#If n is 1, clear from cursor to beginning of the line. 
-	#If n is 2, clear entire line. 
-	#Cursor position does not change. 
 end
 
-@inline equalize(args...)             = equalize(args)
-@inline equalize(args::AbstractArray) = begin
-  common_size = minimum(length.(args))
-	for i in eachindex(args)
-		common_size != length(args[i]) && (args[i] = args[i][1:common_size])
-	end
-	args
-end
-@inline equalize(args::T)     where T = begin
-  common_size = minimum(length.(arrs))
-  (common_size != length(a) ? a[1:common_size] : a for a in args)
-end
-macro equalize(expr)
-  esc(:($expr = equalize($expr)))
-end
 
 
 

@@ -20,7 +20,7 @@ fn(3)
 
 @display q = randn(6,3)
 
-using Boilerplate: push_ifne!, findfirst_typed, idxI, @get, @asyncsafe
+using Boilerplate: push_ifne!, findfirst_typed, idxI, @get, @async_showerr
 
 push_ifne!(a2, 3)
 push_ifne!(a2, 4) # Push if not exists
@@ -42,9 +42,9 @@ fn2(x) = begin
   sleep(x)
 end
 @async fn2("0.2") # DANGER! In certain situation there are actually no error... silent errors are the deadliest enemies. Has to be zeroed! 
-@asyncsafe fn2(0.1)
+@async_showerr fn2(0.1)
 try 
-  @asyncsafe fn2("0.2")
+  @async_showerr fn2("0.2")
 catch e
   println("The error actually catchable!")
   bt = catch_backtrace()
