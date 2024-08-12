@@ -31,7 +31,6 @@ a1 = (randn(Float32, 2,4,2),a2,(rand(1:10,100,5), randn(Float32,100,9)))
 
 using Boilerplate: push_ifne!, findfirst_typed, idxI, @get, @asyncsafe
 
-fieldnames(a1)  # This is equvalent to fieldnames(typeof(a1))  # I believe 99% of us used it wrong at first because this could have been so evident this way... 
 
 push_ifne!(a2, 3)
 push_ifne!(a2, 4) # Push if not exists

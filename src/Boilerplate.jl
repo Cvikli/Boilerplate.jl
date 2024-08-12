@@ -1,5 +1,4 @@
 module Boilerplate
-using Base
 
 # include("./Testing.jl")
 
@@ -15,29 +14,12 @@ export @println
 
 get_parametric(x::Val{P}) where P = P  # I guess there is a simpler way... but for now this was enough.
 
-# It is just crazy how many time did I try to convert anything to string like this... Let's make it default...
-Base.String(x) = "$x" 
-
-
-
-# LIKE WHY this isn't default! :D
-Base.fieldnames(x::Any)             = fieldnames(typeof(x))    # In case of Any we need runtime information... I guess this should work like this 
-# Base.fieldnames(x::Type{TYPE}) where TYPE = fieldnames(TYPE)         # If we have compile time information other than Any then we could use things like this? 
-# Base.fieldnames(x) = fieldnames(typeof(x))  # general... 
-
 # I hate lambda functions sometime...
 noop(vargs...) = nothing 
 
 # push if not exists
 push_ifne!(arr, elem) = (!(elem in arr) && push!(arr, elem))
 
-# Curried functions:
-Base.filter(f::Function) = L -> Base.filter(f, L)
-Base.map(f::Function)    = L -> map(f, L)
-Base.reshape(s1::Union{Colon, Int})                                                                      = arr -> reshape(arr, s1)
-Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int})                                               = arr -> reshape(arr, s1, s2)
-Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int})                        = arr -> reshape(arr, s1, s2, s3)
-Base.reshape(s1::Union{Colon, Int}, s2::Union{Colon, Int}, s3::Union{Colon, Int}, s4::Union{Colon, Int}) = arr -> reshape(arr, s1, s2, s3, s4)
 
 # To handle different nested array structs... Not comprehensive... be noted!
 map_array(fn::Function, arr::AbstractArray{Float32,N})           where N = fn(arr)
@@ -184,7 +166,7 @@ end
 
 
 
-available_memory() = parse(Int, String(read(`grep MemAvailable /proc/meminfo`))[14:end-3])
+available_memory() = parse(Int, "$(read(`grep MemAvailable /proc/meminfo`))"[14:end-3])
 
 
 
