@@ -70,7 +70,8 @@ println("These things actually make everything extremly fast to debug!")
 ```
 
 # Why Use Boilerplate?
-`@show` is extremly useful because it eliminates the need for parentheses. While this might seem minor, it's crucial for quick typing. Julia's most important debugging function should adopt this style as it's super fast to type. (Of course in other languages you use macros for this, but also that gives a crazy amount of boilerplate code, which is a cognitive burden and should be reduced as much as possible.) That is why `@sizes` and `@typeof` is also extremely useful. 
+`@show` is extremly useful because it eliminates the need for parentheses. While this might seem minor, it's crucial for quick typing. Julia's most important debugging function should adopt this style as it's super fast to type. (Of course in other languages you use macros for this, but also that gives a crazy amount of boilerplate code, which is a cognitive burden and should be reduced as much as possible.) 
+That is why `@sizes` and `@typeof` is also extremely useful. 
 (Ofc, it could be standardised by community, as this is mainly for support my own goal.)
 
 
